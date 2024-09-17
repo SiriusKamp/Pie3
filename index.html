@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Início</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="clientsupabase.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+      #banner {
+        padding: 70px 0;
+        border: 3px solid green;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="menu"></div>
+
+    <div id="banner">Controle de tarefas de alunos</div>
+
+    <script>
+      var client = ClientSubapase.getClient();
+      startApp();
+
+      /*carrega menu*/
+      $("#menu").load("menu.html");
+
+      /*método que inicia a aplicação*/
+      async function startApp() {
+        let u = await ClientSubapase.getUser();
+        if (u == null) {
+          window.location = "login.html";
+        }
+
+        const { userError } = await client.from("Usuario").insert(
+          {
+            Email: "EMAIL@EMAIL.COM",
+            Nome: "TESTE",
+            RA: 123456,
+          } // Insere o array com a notificação 'bem-vindo'
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Cadastro de Usuário</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="clientsupabase.js"></script>
+  </head>
+
+  <body>
+    <fieldset>
+      <legend>Cadastro de Usuário</legend>
+      <p>
+        <input type="text" name="nome" placeholder="Nome Completo" required />
+      </p>
+      <p><input type="email" name="email" placeholder="Email" required /></p>
+      <p><input type="password" name="senha" placeholder="Senha" required /></p>
+      <p><input type="text" name="ra" placeholder="RA (Opcional)" /></p>
+      <p><button onclick="cadastrar()">Cadastrar</button></p>
+    </fieldset>
+
+    <script>
+      var client = ClientSubapase.getClient();
+
+      const cadastrar = async function () {
+        let nome = document.getElementsByName("nome")[0].value;
+        let email = document.getElementsByName("email")[0].value;
+        let senha = document.getElementsByName("senha")[0].value;
+        let ra = document.getElementsByName("ra")[0].value;
+
+        // Primeiro, cria o usuário no sistema de autenticação
+        const { data: authData, error: authError } = await client.auth.signUp({
+          email: email,
+          password: senha,
+        });
+        if (authError == null) {
+          // Se a autenticação foi criada com sucesso, insere os dados adicionais na tabela 'Usuario'
+          const { data: userData, error: userError } = await client
+            .from("Usuario")
+            .insert(
+              { Email: email, Nome: nome, RA: ra, Notificação: ["bem-vindo"] } // Insere o array com a notificação 'bem-vindo'
+            );
+          if (userError == null) {
+            alert("Usuário criado com sucesso!");
+            window.location = "index.html"; // Redireciona para a página principal após o cadastro
+          } else {
+            console.log(userError);
+            alert("Erro ao salvar os dados do usuário. \n" + userError.message);
+          }
+        } else {
+          console.log(authError);
+          alert(
+            "Erro ao criar a conta de autenticação. \n" + authError.message
+          );
+        }
+      };
+    </script>
+  </body>
+</html>
