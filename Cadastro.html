@@ -37,11 +37,12 @@
         });
         if (authError == null) {
           // Se a autenticação foi criada com sucesso, insere os dados adicionais na tabela 'Usuario'
-          const { data: userData, error: userError } = await client
-            .from("Usuario")
-            .insert(
-              { Email: email, Nome: nome, RA: ra, Notificação: ["bem-vindo"] } // Insere o array com a notificação 'bem-vindo'
-            );
+          const { userError } = await client.from("usuarios").insert({
+            nome: nome,
+            email: email,
+            ra: ra,
+            notificacao: ["Bem Vindo"],
+          });
           if (userError == null) {
             alert("Usuário criado com sucesso!");
             window.location = "index.html"; // Redireciona para a página principal após o cadastro

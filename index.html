@@ -35,14 +35,6 @@
         if (u == null) {
           window.location = "login.html";
         }
-
-        const { userError } = await client.from("Usuario").insert(
-          {
-            Email: "EMAIL@EMAIL.COM",
-            Nome: "TESTE",
-            RA: 123456,
-          } // Insere o array com a notificação 'bem-vindo'
-        );
       }
     </script>
   </body>
