@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Listar Laboratórios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="laboratorio.css" />
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="clientsupabase.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  </head>
+
+  <body>
+    <div id="menu"></div>
+
+    <h1>Lista de Laboratórios</h1>
+
+    <!-- Botão para adicionar laboratório (só visível para admins) -->
+    <button id="add-laboratorio">+</button>
+
+    <!-- Card para inserir um novo laboratório -->
+    <div id="laboratorio-card">
+      <h2>Inserir Novo Laboratório</h2>
+      <input
+        type="text"
+        id="laboratorio-nome"
+        placeholder="Nome do Laboratório"
+      />
+      <button onclick="inserirLaboratorio()">Salvar</button>
+    </div>
+
+    <div id="laboratorio-list"></div>
+
+    <script src="laboratorio.js"></script>
+  </body>
+</html>

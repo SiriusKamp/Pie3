@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Editar Usuário</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="clientsupabase.js"></script>
+    <link rel="stylesheet" href="editarUsuario.css" />
+  </head>
+  <body>
+    <div id="menu"></div>
+    <h1>Editar Usuário</h1>
+    <form id="editar-usuario-form">
+      <input type="hidden" id="usuario-id" />
+      <label for="usuario-nome">Nome:</label>
+      <input type="text" id="usuario-nome" required />
+      <label for="usuario-ra">RA:</label>
+      <input type="text" id="usuario-ra" required />
+      <label for="usuario-email">Email:</label>
+      <input type="email" id="usuario-email" disabled required />
+      <button type="submit">Salvar</button>
+    </form>
+
+    <script>
+      const client = ClientSubapase.getClient();
+
+      async function loadUsuario() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
+
+        const { data: usuario, error } = await client
+          .from("usuarios")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (error) {
+          console.error("Erro ao buscar usuário:", error);
+          alert("Erro ao carregar usuário.");
+          return;
+        }
+
+        $("#usuario-id").val(usuario.id);
+        $("#usuario-nome").val(usuario.nome);
+        $("#usuario-ra").val(usuario.ra);
+        $("#usuario-email").val(usuario.email);
+      }
+
+      $("#editar-usuario-form").on("submit", async function (e) {
+        e.preventDefault();
+        const id = $("#usuario-id").val();
+        const nome = $("#usuario-nome").val();
+        const ra = $("#usuario-ra").val();
+
+        const { error } = await client
+          .from("usuarios")
+          .update({ nome: nome, ra: ra })
+          .eq("id", id);
+
+        if (error) {
+          console.error("Erro ao atualizar usuário:", error);
+          alert("Erro ao atualizar usuário.");
+        } else {
+          alert("Usuário atualizado com sucesso!");
+          window.location.href = "usuarios.html"; // Redireciona após a atualização
+        }
+      });
+
+      loadUsuario(); // Carrega os dados do usuário ao iniciar
+    </script>
+  </body>
+</html>

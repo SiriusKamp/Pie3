@@ -1,0 +1,189 @@
+/* Estilos gerais */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fa;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+/* Estilos para o cabeçalho */
+h2 {
+  color: #fff;
+  background-color: #2e00b6;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+/* Estilos para o container de reservas */
+.reservas-container {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+/* Estilos da tabela */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #2e00b6;
+  color: white;
+  font-weight: bold;
+}
+
+td {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Estilos para quando não há reservas */
+.no-reservas {
+  text-align: center;
+  color: #888;
+  font-size: 1.2em;
+  padding: 20px;
+}
+
+/* Estilos dos botões */
+.button {
+  background-color: #00a743;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #1a0080;
+}
+
+.button-red {
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.button-red:hover {
+  background-color: #cc0000;
+}
+
+/* Estilos para reservas com diferentes status */
+.reserva-em-analise td {
+  background-color: #ffeb3bab; /* Amarelo */
+}
+
+.reserva-rejeitada td {
+  background-color: #f4433697; /* Vermelho */
+  color: white;
+}
+
+.reserva-aprovada td {
+  background-color: #4caf4f8d; /* Verde */
+  color: white;
+}
+
+/* Estilos para adicionar reserva */
+.add-reserva-container {
+  margin-bottom: 20px;
+}
+
+.add-reserva-btn {
+  background-color: green;
+  color: white;
+  font-size: 24px;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.reserva-form {
+  margin-bottom: 20px;
+}
+
+.reserva-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.reserva-form form input,
+.reserva-form form select {
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+.reserva-form form button {
+  background-color: rgb(0, 255, 72);
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Estilos para o calendário */
+#calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.dia {
+  background-color: white;
+  border: 1px solid #ccc;
+  position: relative; /* Para que os filhos possam usar absolute */
+  overflow: visible;  /* Permite que os filhos sejam visíveis fora do card */
+  height: auto;       /* Altura automática para permitir crescimento */
+  min-height: 100px;  /* Altura mínima do card */
+}
+
+.reserva {
+  background-color: #4caf50;
+  color: white;
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 3px;
+  position: relative; /* Modificado para ser relativo ao card do dia */
+  z-index: 1; /* Garante que os compromissos fiquem em cima */
+}
+
+
+.reserva-em-analise {
+  background-color: #ffeb3bab; /* Amarelo */
+}
+
+.reserva-rejeitada {
+  background-color: #f4433697; /* Vermelho */
+}
+
+.reserva-aprovada {
+  background-color: #4caf4f8d; /* Verde */
+}

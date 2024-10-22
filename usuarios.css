@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  
+
+  
+  #usuario-list {
+    display: absolute;
+    margin-left: 35%;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .usuario-item {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgb(126, 126, 126);
+    text-align: center;
+    width: 300px;
+  }
+  
+  .usuario-item h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+    color: #000000;
+  }
+  
+  .usuario-item p {
+    margin: 0;
+    color: #000000;
+  }
+  /* Estilo para os botões de usuário */
+.usuario-botao {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Estilo para o botão de editar */
+.usuario-botao-editar {
+    background-color: #007bff;
+    color: white;
+}
+
+.usuario-botao-editar:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo para o botão de deletar */
+.usuario-botao-deletar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.usuario-botao-deletar:hover {
+    background-color: #c82333;
+}
+
+/* Estilo para o botão de alterar grupo */
+.usuario-botao-alterar {
+    background-color: #28a745;
+    color: white;
+}
+
+.usuario-botao-alterar:hover {
+    background-color: #218838;
+}

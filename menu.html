@@ -1,11 +1,20 @@
-<!-- https://www.w3schools.com/html/tryit.asp?filename=tryhtml_lists_menu -->
 <style>
+  /* Contêiner principal que mantém o menu e as notificações alinhados */
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333333;
+    padding-top: 0%; /* Adiciona um espaçamento interno para o conteúdo */
+    margin-top: 0%;
+    margin-bottom: 1%;
+  }
+
   ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #333333;
   }
 
   li {
@@ -23,10 +32,132 @@
   li a:hover {
     background-color: #111111;
   }
+
+  /* Estilos para notificações */
+  #notification-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative; /* Adicionado para fornecer contexto para o posicionamento do contêiner de notificações */
+    margin-right: 3%;
+  }
+
+  #show-notifications {
+    position: relative; /* Para garantir que o contador seja posicionado em relação ao botão */
+    padding: 10px 15px;
+    background-color: #999999;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #show-notifications:hover {
+    background-color: #00ff51;
+  }
+
+  .notification-counter {
+    position: absolute; /* Relativo ao botão de notificação */
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    display: flex; /* Alinhamento centralizado do número */
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  #notifications {
+    display: none;
+    position: absolute;
+    top: 100%; /* Coloca o contêiner de notificações logo abaixo do botão */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-height: 200px;
+    overflow-y: auto; /* Permite rolagem vertical */
+    z-index: 1000;
+  }
+
+  .notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .notification-item:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
 </style>
-<ul>
-  <li><a href="index.html">Home</a></li>
-  <li><a href="alunos.html">Professores</a></li>
-  <li><a href="tarefas.html">Laboratorios</a></li>
-  <li><a href="logout.html">Deslogar</a></li>
-</ul>
+
+<div class="header-container">
+  <!-- Contêiner do menu -->
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="usuarios.html">Professores</a></li>
+    <li><a href="laboratorio.html">Laboratórios</a></li>
+    <li><a href="logout.html">Deslogar</a></li>
+  </ul>
+
+  <!-- Contêiner das notificações -->
+  <div id="notification-container">
+    <button id="show-notifications">
+      <img src="notificacao.png" width="20px" height="20px" />
+      <div class="notification-counter" id="notification-counter"></div>
+    </button>
+    <div id="notifications"></div>
+  </div>
+</div>
+
+<script>
+  var TESTE = ClientSubapase.getClient();
+  let totalNotifications = 0;
+
+  async function loadUserNotifications(email) {
+    const { data, error } = await TESTE.from("usuarios")
+      .select("notificacao")
+      .eq("email", email)
+      .single();
+
+    if (error) {
+      console.error("Erro ao buscar notificações:", error);
+    } else {
+      if (data && data.notificacao) {
+        $("#notifications").empty();
+        const notificationsToShow = data.notificacao;
+        notificationsToShow.forEach((notificacao) => {
+          $("#notifications").append(
+            `<div class="notification-item">${notificacao}</div>`
+          );
+        });
+
+        totalNotifications = data.notificacao.length;
+        $("#notification-counter").text(totalNotifications).show();
+      }
+    }
+  }
+
+  $("#show-notifications").click(function () {
+    $("#notifications").toggle();
+  });
+
+  $(document).on("click", ".notification-item", function () {
+    $("#notifications").hide();
+  });
+
+  async function initNotifications() {
+    let u = await ClientSubapase.getUser();
+    if (u) {
+      await loadUserNotifications(u.email);
+    }
+  }
+
+  initNotifications();
+</script>

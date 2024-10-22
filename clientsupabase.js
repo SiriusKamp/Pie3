@@ -1,8 +1,8 @@
 class ClientSubapase {
   static getClient() {
     return supabase.createClient(
-      "https://qorggjotigruewaiffmx.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFvcmdnam90aWdydWV3YWlmZm14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM1MDMwODcsImV4cCI6MjAzOTA3OTA4N30.YlbVI08bVrLFyvECTwU5sUh0_Xj3cSZikDI5Kg63B64"
+      "https://tihtqlfeuprnhrndjvhg.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpaHRxbGZldXBybmhybmRqdmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjc3NDI5NDgsImV4cCI6MjA0MzMxODk0OH0.z_oIGDFBcLC6FBZ1bYE9jE-9QYv_BJwPxS5PoZLvCYw"
     );
   }
 

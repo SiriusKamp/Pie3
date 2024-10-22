@@ -1,41 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Início</title>
+    <title>Listagem de Reservas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="clientsupabase.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <style>
-      #banner {
-        padding: 70px 0;
-        border: 3px solid green;
-        text-align: center;
-      }
-    </style>
-  </head>
 
+    <link rel="stylesheet" href="index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.js"></script>
+    <script src="clientsupabase.js"></script>
+    <script src="index.js" defer></script>
+  </head>
   <body>
     <div id="menu"></div>
 
-    <div id="banner">Controle de tarefas de alunos</div>
+    <div class="add-reserva-container">
+      <button class="add-reserva-btn" onclick="toggleForm()">+</button>
+    </div>
+
+    <div id="reserva-form" class="reserva-form" style="display: none">
+      <h3>Adicionar Nova Reserva</h3>
+      <form id="nova-reserva-form">
+        <label for="datainicio">Data de Início:</label>
+        <input type="text" id="datainicio" name="datainicio" required />
+
+        <label for="datafinal">Data Final:</label>
+        <input type="text" id="datafinal" name="datafinal" required />
+
+        <label for="laboratorio">Laboratório:</label>
+        <select id="laboratorio" name="laboratorio" required>
+          <!-- Laboratórios serão carregados dinamicamente -->
+        </select>
+        <button type="submit">Adicionar Reserva</button>
+      </form>
+    </div>
+
+    <div class="reservas-container">
+      <h2>Reservas em Análise</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Laboratório</th>
+            <th>Data Inicial</th>
+            <th>Data Final</th>
+            <th>Professor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="reservas-em-analise-list">
+          <tr>
+            <td colspan="6" class="no-reservas">Carregando...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="reservas-container">
+      <h2>Reservas Aprovadas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Laboratório</th>
+            <th>Data Inicial</th>
+            <th>Data Final</th>
+            <th>Professor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="reservas-aprovadas-list">
+          <tr>
+            <td colspan="6" class="no-reservas">Carregando...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="container">
+      <h1>Calendário de Reservas</h1>
+      <div id="calendario"></div>
+    </div>
 
     <script>
-      var client = ClientSubapase.getClient();
-      startApp();
+      flatpickr("#datainicio", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+      });
 
-      /*carrega menu*/
-      $("#menu").load("menu.html");
-
-      /*método que inicia a aplicação*/
-      async function startApp() {
-        let u = await ClientSubapase.getUser();
-        if (u == null) {
-          window.location = "login.html";
-        }
-      }
+      flatpickr("#datafinal", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+      });
     </script>
   </body>
 </html>

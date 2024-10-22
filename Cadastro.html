@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,6 +7,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="clientsupabase.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      fieldset {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      legend {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="password"]:focus {
+        border-color: #66afe9;
+        outline: none; /* Remove a borda azul padrão */
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff; /* Azul */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+        margin: 10px 0; /* Espaçamento entre os botões */
+      }
+
+      button:hover {
+        background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
+      }
+
+      .login-button {
+        background-color: #6c757d; /* Cinza */
+      }
+
+      .login-button:hover {
+        background-color: #5a6268; /* Cinza mais escuro ao passar o mouse */
+      }
+
+      p {
+        margin: 0; /* Remove margens dos parágrafos */
+      }
+    </style>
   </head>
 
   <body>
@@ -15,10 +87,23 @@
       <p>
         <input type="text" name="nome" placeholder="Nome Completo" required />
       </p>
-      <p><input type="email" name="email" placeholder="Email" required /></p>
-      <p><input type="password" name="senha" placeholder="Senha" required /></p>
-      <p><input type="text" name="ra" placeholder="RA (Opcional)" /></p>
-      <p><button onclick="cadastrar()">Cadastrar</button></p>
+      <p>
+        <input type="email" name="email" placeholder="Email" required />
+      </p>
+      <p>
+        <input type="password" name="senha" placeholder="Senha" required />
+      </p>
+      <p>
+        <input type="text" name="ra" placeholder="RA (Opcional)" />
+      </p>
+      <p>
+        <button type="button" onclick="cadastrar()">Cadastrar</button>
+      </p>
+      <p>
+        <button class="login-button" onclick="window.location='login.html'">
+          Voltar ao Login
+        </button>
+      </p>
     </fieldset>
 
     <script>
@@ -26,29 +111,36 @@
 
       const cadastrar = async function () {
         let nome = document.getElementsByName("nome")[0].value;
-        let email = document.getElementsByName("email")[0].value;
+        let _email = document.getElementsByName("email")[0].value;
         let senha = document.getElementsByName("senha")[0].value;
         let ra = document.getElementsByName("ra")[0].value;
 
         // Primeiro, cria o usuário no sistema de autenticação
-        const { data: authData, error: authError } = await client.auth.signUp({
-          email: email,
+        const {
+          data: authData,
+          session,
+          error: authError,
+        } = await client.auth.signUp({
+          email: _email,
           password: senha,
         });
+
+        console.log(authData, authError);
+
         if (authError == null) {
           // Se a autenticação foi criada com sucesso, insere os dados adicionais na tabela 'Usuario'
-          const { userError } = await client.from("usuarios").insert({
+          const { error } = await client.from("usuarios").insert({
             nome: nome,
-            email: email,
+            email: _email,
             ra: ra,
             notificacao: ["Bem Vindo"],
           });
-          if (userError == null) {
+          if (error == null) {
             alert("Usuário criado com sucesso!");
             window.location = "index.html"; // Redireciona para a página principal após o cadastro
           } else {
-            console.log(userError);
-            alert("Erro ao salvar os dados do usuário. \n" + userError.message);
+            console.log(error);
+            alert("Erro ao salvar os dados do usuário. \n" + error.message);
           }
         } else {
           console.log(authError);
