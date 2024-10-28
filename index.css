@@ -187,3 +187,79 @@ tr:hover {
 .reserva-aprovada {
   background-color: #4caf4f8d; /* Verde */
 }
+.dia-atual {
+  background-color: orange;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+}
+.reservas-filtradas {
+  background-color: #e0f7fa; /* Fundo azulado */
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.titulo-reservas-filtradas {
+  font-size: 1.5em;
+  color: #ffffff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.tabela-reservas {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabela-reservas th {
+  background-color: #00796b;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+.tabela-reservas td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.tabela-reservas tr:nth-child(even) {
+  background-color: #f2f2f2; /* Linhas alternadas */
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaçamento entre os campos */
+  margin-bottom: 20px; /* Espaçamento inferior */
+}
+.filter-date,
+.filter-laboratorio {
+  padding: 10px; /* Espaçamento interno */
+  border: 2px solid #00796b; /* Borda do campo */
+  border-radius: 5px; /* Bordas arredondadas */
+  font-size: 1em; /* Tamanho da fonte */
+  width: 200px; /* Largura dos campos */
+  transition: border-color 0.3s; /* Transição suave para a borda */
+}
+.filter-date:focus,
+.filter-laboratorio:focus {
+  border-color: #004d40; /* Cor da borda ao focar */
+  outline: none; /* Remove o contorno padrão do navegador */
+}
+
+.filter-button {
+  padding: 10px 15px; /* Espaçamento interno */
+  background-color: #00796b; /* Cor do fundo do botão */
+  color: white; /* Cor do texto */
+  border: none; /* Remove borda padrão */
+  border-radius: 5px; /* Bordas arredondadas */
+  cursor: pointer; /* Cursor de ponteiro ao passar o mouse */
+  transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+}
+
+.filter-button:hover {
+  background-color: #004d40; /* Cor de fundo ao passar o mouse */
+}
+

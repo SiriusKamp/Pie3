@@ -58,23 +58,26 @@ async function loadReservas() {
   const professorId = professorData.id;
   let query;
 
-  // Adicionando filtro para reservas a partir da data atual e ordenando
-  const currentDate = new Date().toISOString(); // Data atual em ISO
+  // Obter a data e hora atuais
+  const now = new Date();
+  // Obter a data de 24 horas atrás
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+
   if (admin) {
     query = client
       .from("reservas")
       .select(
         `
-      id,
-      datainicio,
-      datafinal,
-      laboratorio: laboratorios(nome),
-      professor : usuarios(nome),
-      status
-    `
+        id,
+        datainicio,
+        datafinal,
+        laboratorio: laboratorios(nome),
+        professor: usuarios(nome),
+        status
+      `
       )
-      .gt("datainicio", currentDate) // Filtra reservas a partir da data atual
-      .order("datainicio", { ascending: true }); // Ordena pela data de início
+      .gte("datafinal", yesterday) // Inclui reservas até 24 horas antes da data atual
+      .order("datainicio", { ascending: true });
   } else {
     query = client
       .from("reservas")
@@ -89,11 +92,16 @@ async function loadReservas() {
       `
       )
       .eq("professor", professorId)
-      .gt("datainicio", currentDate) // Filtra reservas a partir da data atual
-      .order("datainicio", { ascending: true }); // Ordena pela data de início
+      .gte("datafinal", yesterday) // Inclui reservas até 24 horas antes da data atual
+      .order("datainicio", { ascending: true });
   }
 
   const { data, error } = await query;
+
+  if (error) {
+    console.error("Erro ao carregar reservas:", error);
+    return;
+  }
 
   // O restante do código continua igual
   const reservasEmAnaliseList = $("#reservas-em-analise-list");
@@ -129,23 +137,44 @@ async function loadReservas() {
     } else if (status === "Aprovada" && professor === professorId) {
       statusClass = "reserva-aprovada"; // Somente as aprovadas do usuário logado em verde
     }
-
+    const datainicioformatada = new Date(datainicio).toLocaleString();
+    const datafinalformatada = new Date(datafinal).toLocaleString();
+    datainicionotficacao = new Date(reserva.datainicio);
+    datainicionotficacao.setHours(datainicionotficacao.getHours() - 3);
+    datafinalnotficacao = new Date(reserva.datafinal);
+    datafinalnotficacao.setHours(datafinalnotficacao.getHours() - 3);
     const reservaRow = `
     <tr class="${statusClass}">
       <td>${laboratorio.nome}</td>
-      <td>${new Date(datainicio).toLocaleString()}</td>
-      <td>${new Date(datafinal).toLocaleString()}</td>
+      <td>${datainicioformatada}</td>
+      <td>${datafinalformatada}</td>
       <td>${professorDisplay}</td>
       <td>${status}</td>
       <td>
         ${
           admin && status === "Em Analise"
-            ? `<button class="button" onclick="updateReserva(${reserva.id}, 'Aprovada')">Aprovar</button>`
+            ? `<button class="button" onclick="updateReserva(${
+                reserva.id
+              }, 'Aprovada', '${new Date(
+                datainicionotficacao
+              ).toISOString()}', '${new Date(
+                datafinalnotficacao
+              ).toISOString()}', '${
+                reserva.laboratorio.nome
+              }')">Aprovar</button>`
             : ""
         }
         ${
           admin && status === "Aprovada"
-            ? `<button class="button" onclick="updateReserva(${reserva.id}, 'Em Analise')">Reverter</button>`
+            ? `<button class="button" onclick="updateReserva(${
+                reserva.id
+              }, 'Em Analise', '${new Date(
+                reserva.datainicio
+              ).toISOString()}', '${new Date(
+                reserva.datafinal
+              ).toISOString()}', '${
+                reserva.laboratorio.nome
+              }')">Reverter</button>`
             : ""
         }
         <button class="button-red" onclick="handleDeleteOrReject(${
@@ -182,8 +211,13 @@ async function loadReservas() {
   }
 }
 
-// Função para atualizar o status da reserva
-async function updateReserva(id, novoStatus) {
+async function updateReserva(
+  id,
+  novoStatus,
+  datainicio,
+  datafinal,
+  laboratorio
+) {
   const { data: reservaData, error: reservaError } = await client
     .from("reservas")
     .select("professor")
@@ -207,16 +241,17 @@ async function updateReserva(id, novoStatus) {
     // Adiciona notificação ao usuário
     const notificacao =
       novoStatus === "Aprovada"
-        ? "Reserva aprovada"
+        ? `Reserva aprovada: ${laboratorio} ${datainicio} ${datafinal}`
         : novoStatus === "Rejeitada"
-        ? "Reserva rejeitada"
-        : "Reserva revertida";
+        ? `Reserva rejeitada: ${laboratorio} ${datainicio} ${datafinal}`
+        : `Reserva desaprovada: ${laboratorio} ${datainicio} ${datafinal}`;
 
     await adicionarNotificacao(reservaData.professor, notificacao);
 
     loadReservas(); // Recarrega as reservas após a atualização
   }
 }
+
 // Função para adicionar uma notificação ao usuário
 async function adicionarNotificacao(usuarioId, mensagem) {
   // Recupera as notificações existentes do usuário
@@ -351,6 +386,14 @@ async function loadLaboratorios() {
     console.error("Erro ao carregar laboratórios:", error);
     return;
   }
+  const laboratorioSelectF = document.getElementById("laboratorioFiltro");
+
+  laboratorios.forEach((laboratorio) => {
+    const option = document.createElement("option");
+    option.value = laboratorio.id;
+    option.textContent = laboratorio.nome;
+    laboratorioSelectF.appendChild(option);
+  });
 
   const laboratorioSelect = document.getElementById("laboratorio");
   laboratorios.forEach((lab) => {
@@ -360,6 +403,7 @@ async function loadLaboratorios() {
     laboratorioSelect.appendChild(option);
   });
 }
+
 document
   .getElementById("reserva-form")
   .addEventListener("submit", async (event) => {
@@ -455,8 +499,6 @@ document
   });
 
 //TESTE
-// Função para buscar reservas aprovadas do Supabase
-// Função para buscar reservas aprovadas do Supabase
 async function buscarReservas() {
   const { data, error } = await client
     .from("reservas")
@@ -468,19 +510,28 @@ async function buscarReservas() {
     return [];
   }
 
-  return data.map((reserva) => {
-    return {
-      data: reserva.datafinal.split("T")[0],
-      horario: `${new Date(reserva.datainicio).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })} - ${new Date(reserva.datafinal).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`,
-      laboratorio: reserva.laboratorio.nome,
-    };
-  });
+  const agora = new Date();
+
+  // Filtrar as reservas cuja data final tenha passado mais de 24 horas da data atual
+  return data
+    .filter((reserva) => {
+      const dataFinal = new Date(reserva.datafinal);
+      const diffEmHoras = (agora - dataFinal) / (1000 * 60 * 60);
+      return diffEmHoras <= 24;
+    })
+    .map((reserva) => {
+      return {
+        data: reserva.datafinal.split("T")[0],
+        horario: `${new Date(reserva.datainicio).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })} - ${new Date(reserva.datafinal).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        laboratorio: reserva.laboratorio.nome,
+      };
+    });
 }
 
 // Função para exibir reservas
@@ -523,9 +574,12 @@ async function exibirReservas() {
   }
 }
 
-// Chame a função para exibir as reservas ao carregar a página
-document.addEventListener("DOMContentLoaded", () => {
-  exibirReservas();
+document.addEventListener("DOMContentLoaded", async () => {
+  // Remova ou ajuste a chamada se não for necessária
+  const reservas = await loadReservas();
+  if (reservas) {
+    exibirReservas(reservas);
+  }
 });
 
 async function criarCalendario(mes, ano) {
@@ -533,6 +587,12 @@ async function criarCalendario(mes, ano) {
   const primeiroDia = new Date(ano, mes, 1);
   const diasNoMes = new Date(ano, mes + 1, 0).getDate();
   const diasDaSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+
+  // Obter data atual para destacar o dia
+  const hoje = new Date();
+  const diaAtual = hoje.getDate();
+  const mesAtual = hoje.getMonth();
+  const anoAtual = hoje.getFullYear();
 
   // Criar cabeçalho com os dias da semana
   const calendarioDiv = document.getElementById("calendario");
@@ -546,7 +606,7 @@ async function criarCalendario(mes, ano) {
   });
 
   // Calcular o dia da semana em que o primeiro dia do mês cai
-  const primeiroDiaDaSemana = primeiroDia.getDay() + 1; // 0 = domingo, 1 = segunda, ...
+  const primeiroDiaDaSemana = primeiroDia.getDay();
 
   // Preencher dias do mês anterior para manter a estrutura do calendário
   const diasDoMesAnterior = primeiroDia.getDate() - primeiroDiaDaSemana;
@@ -567,7 +627,7 @@ async function criarCalendario(mes, ano) {
     reservasDoDia.forEach((reserva) => {
       const reservaDiv = document.createElement("div");
       reservaDiv.className = "reserva";
-      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`; // Mostrando o nome do laboratório
+      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`;
       diaDiv.appendChild(reservaDiv);
     });
 
@@ -578,6 +638,12 @@ async function criarCalendario(mes, ano) {
   for (let i = 1; i <= diasNoMes; i++) {
     const diaDiv = document.createElement("div");
     diaDiv.className = "dia";
+
+    // Destacar o dia atual com uma cor laranja
+    if (i === diaAtual && mes === mesAtual && ano === anoAtual) {
+      diaDiv.classList.add("dia-atual");
+    }
+
     diaDiv.innerHTML = `<h4>${i}</h4>`;
 
     const dataAtual = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(
@@ -591,7 +657,7 @@ async function criarCalendario(mes, ano) {
     reservasDoDia.forEach((reserva) => {
       const reservaDiv = document.createElement("div");
       reservaDiv.className = "reserva";
-      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`; // Mostrando o nome do laboratório
+      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`;
       diaDiv.appendChild(reservaDiv);
     });
 
@@ -599,7 +665,7 @@ async function criarCalendario(mes, ano) {
   }
 
   // Preencher dias do próximo mês
-  const diasRestantes = 43 - (diasNoMes + primeiroDiaDaSemana);
+  const diasRestantes = 42 - (diasNoMes + primeiroDiaDaSemana);
   for (let i = 1; i <= diasRestantes; i++) {
     const diaDiv = document.createElement("div");
     diaDiv.className = "dia";
@@ -616,7 +682,7 @@ async function criarCalendario(mes, ano) {
     reservasDoDia.forEach((reserva) => {
       const reservaDiv = document.createElement("div");
       reservaDiv.className = "reserva";
-      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`; // Mostrando o nome do laboratório
+      reservaDiv.textContent = `${reserva.horario} - ${reserva.laboratorio}`;
       diaDiv.appendChild(reservaDiv);
     });
 
@@ -624,10 +690,98 @@ async function criarCalendario(mes, ano) {
   }
 }
 
+async function filtrarReservas() {
+  const dataInput = document.getElementById("dataFiltro").value;
+  const laboratorioInput = document.getElementById("laboratorioFiltro").value;
+
+  let query = client.from("reservas").select(`
+    id,
+    datainicio,
+    datafinal,
+    laboratorio: laboratorios(nome),
+    professor,
+    status
+  `);
+  query = query.eq("status", "Aprovada");
+
+  if (laboratorioInput) {
+    query = query.eq("laboratorio", laboratorioInput);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error("Erro ao filtrar reservas:", error);
+    return;
+  }
+
+  exibirReservas(data, dataInput);
+}
+
+function exibirReservas(reservas, dataInput) {
+  const reservaLista = document.querySelector(".reservas-filtradas");
+
+  if (!reservaLista) {
+    console.error("Elemento de lista de reservas não encontrado.");
+    return;
+  }
+
+  reservaLista.innerHTML = ""; // Limpar resultados anteriores
+
+  // Exibe ou oculta a div com base na existência de reservas
+  reservaLista.style.display = reservas.length ? "block" : "none";
+
+  // Criação da estrutura da tabela com cabeçalho
+  let tableHTML = `
+    <h2 class="titulo-reservas-filtradas">Reservas Filtradas</h2>
+    <table class="tabela-reservas">
+      <thead>
+        <tr>
+          <th>Data Início</th>
+          <th>Data Fim</th>
+          <th>Laboratório</th>
+          <th>Professor</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  // Filtro de data, se houver
+  let dataFiltro = null;
+  if (dataInput) {
+    dataFiltro = new Date(dataInput);
+    dataFiltro.setHours(dataFiltro.getHours() + 3); // Adiciona 3 horas
+    dataFiltro = dataFiltro.toLocaleDateString();
+  }
+
+  reservas.forEach((reserva) => {
+    const dataInicio = new Date(reserva.datainicio).toLocaleDateString();
+    const dataFinal = new Date(reserva.datafinal).toLocaleDateString();
+    const datainicioformatada = new Date(reserva.datainicio).toLocaleString();
+    const datafinalformatada = new Date(reserva.datafinal).toLocaleString();
+    if (!dataFiltro || dataFiltro === dataInicio || dataFiltro === dataFinal) {
+      tableHTML += `
+        <tr>
+          <td>${datainicioformatada}</td>
+          <td>${datafinalformatada}</td>
+          <td>${reserva.laboratorio.nome}</td>
+          <td>${reserva.professor}</td>
+        </tr>`;
+    }
+  });
+
+  tableHTML += `
+      </tbody>
+    </table>`;
+
+  // Insere a tabela dentro da div reservaLista
+  reservaLista.innerHTML = tableHTML;
+}
+
 // Definir mês e ano atual
 const dataAtual = new Date();
-const mesAtual = dataAtual.getMonth(); // Mês atual (0-11)
-const anoAtual = dataAtual.getFullYear(); // Ano atual
+const mesAtual = dataAtual.getMonth();
+const anoAtual = dataAtual.getFullYear();
 criarCalendario(mesAtual, anoAtual);
 
 loadLaboratorios();

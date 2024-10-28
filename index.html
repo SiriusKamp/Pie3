@@ -41,6 +41,25 @@
         <button type="submit">Adicionar Reserva</button>
       </form>
     </div>
+    <!-- Campo de Filtro -->
+    <div class="filter-container">
+      <h3>Filtragem : </h3>
+      <label for="dataFiltro">Data:</label>
+      <input type="date" id="dataFiltro" name="filter-date" class = "filter-date" />
+
+      <label for="laboratorioFiltro">Laboratório:</label>
+      <select id="laboratorioFiltro" name="filter-laboratorio" class = "filter-laboratorio">
+        <option value="">Selecione</option>
+        <!-- Opções dos laboratórios serão preenchidas dinamicamente -->
+      </select>
+
+      <button id="filter-submit" onclick="filtrarReservas()" class = "filter-button">Filtrar</button>
+    </div>
+
+    <!-- Div para exibir as reservas filtradas -->
+<div class="reservas-filtradas" style="display: none;"></div>
+    <!-- Div para reservas em análise e outros conteúdos -->
+    </div>
 
     <div class="reservas-container">
       <h2>Reservas em Análise</h2>
